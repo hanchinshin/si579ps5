@@ -5,7 +5,17 @@ const outputDescription = document.getElementById("output_description");
 const wordOutput = document.getElementById("word_output");
 const showRhymesBtn = document.getElementById("show_rhymes");
 const showSynonymsBtn = document.getElementById("show_synonyms");
+const link = "https://api.datamuse.com/words?"
 const savedWordsList = [];
+
+//add "s"
+function addS(num) {
+    if (num === 1) {
+        return "";
+    } else {
+        return "s";
+    }
+}
 
 /**
  * Returns a list of objects grouped by some property. For example:
@@ -46,20 +56,11 @@ const savedWordsList = [];
     return result;
 }
 
-//add "s"
-function addS(num) {
-    if (num === 1) {
-        return "";
-    } else {
-        return "s";
-    }
-}
-
 //get rhymes
 async function getRhymes() {
     outputDescription.textContent = "Words that rhyme with " + wordInput.value + ": ";
     wordOutput.textContent = "...loading";
-    const result = await fetch("https://api.datamuse.com/words?rel_rhy="+wordInput.value);
+    const result = await fetch(link + "rel_rhy=" +wordInput.value);
     const dict = await result.json();
     
     if (dict.length===0) {
@@ -71,16 +72,16 @@ async function getRhymes() {
             const newHeader = document.createElement("h3");
             newHeader.textContent = `${elem} syllable${addS(Number(elem))}:`; //addS func
             wordOutput.append(newHeader);
-            for (const item of wordGroup[elem]) {
+            for (const word of wordGroup[elem]) {
                 const newList = document.createElement("li");
-                newList.textContent = item.word;
+                newList.textContent = word.word;
                 const saveBtn = document.createElement('button');
                 saveBtn.textContent = "save";
                 wordOutput.append(newList);
                 newList.append(saveBtn);
                 saveBtn.classList.add("btn", "btn-outline-success");
                 saveBtn.addEventListener('click', ()=> {
-                    savedWordsList.push(item.word);
+                    savedWordsList.push(word.word);
                     savedWords.innerText = savedWordsList.join(', ');
                 });
             }
@@ -100,35 +101,35 @@ wordInput.addEventListener('keydown', function(event) {
 async function getSynonyms() {
     outputDescription.textContent = "Words that rhyme with " + wordInput.value + ": ";
     wordOutput.textContent = "...loading";
-    const result = await fetch('https://api.datamuse.com/words?ml='+wordInput.value); //change url to the ml api
+    const result = await fetch(link + "ml=" +wordInput.value); //change url to the ml api
     const dict = await result.json();
-    
+
     if (dict.length===0) {
         wordOutput.textContent = "(no results)";
     } else {
         wordOutput.textContent = `Words that rhyme with ${wordInput.value}: `;
         const wordGroup = groupBy(dict, 'numSyllables');
+        //console.log(dict);
         for (const elem in wordGroup) {
             const newHeader = document.createElement("h3");
             newHeader.textContent = `${elem} syllable${addS(Number(elem))}:`;
             wordOutput.append(newHeader);
-            for (const item of wordGroup[elem]) {
+            for (const word of wordGroup[elem]) {
                 const newList = document.createElement("li");
-                newList.textContent = item.word;
+                newList.textContent = word.word;
                 const saveBtn = document.createElement('button');
                 saveBtn.textContent = "save";
                 wordOutput.append(newList);
                 newList.append(saveBtn);
                 saveBtn.classList.add("btn", "btn-outline-success");
                 saveBtn.addEventListener('click', ()=> {
-                    savedWordsList.push(item.word);
+                    savedWordsList.push(word.word);
                     savedWords.innerText = savedWordsList.join(', ');
                 });
             }
         }
     }
 }
-
 
 //EventListener
 showSynonymsBtn.addEventListener('click', getSynonyms);
@@ -137,8 +138,3 @@ wordInput.addEventListener('keydown', function(event) {
         getSynonyms();
     }
 });
-
-
-
-
-
