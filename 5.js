@@ -107,7 +107,7 @@ async function getSynonyms() {
     if (dict.length===0) {
         wordOutput.textContent = "(no results)";
     } else {
-        wordOutput.textContent = `Words that rhyme with ${wordInput.value}: `;
+        wordOutput.textContent = `Words with a meaning similar to ${wordInput.value}: `;
         const wordGroup = groupBy(dict, 'numSyllables');
         //console.log(dict);
         for (const elem in wordGroup) {
